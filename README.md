@@ -1,3 +1,3 @@
 # guess-game
 
-making a guessing game from the rust book.
+expanding guessing game from the rust book.
