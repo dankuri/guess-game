@@ -3,9 +3,10 @@ use std::cmp::Ordering;
 use std::io;
 
 fn main() {
-    println!("guess my num, pls...");
+    println!("guess my num (1 to 100), pls...");
 
     let secret_num = rand::thread_rng().gen_range(1..=100);
+    let mut guess_count = 0;
 
     loop {
         println!("type ur guess: ");
@@ -22,12 +23,13 @@ fn main() {
         };
 
         println!("ur guess: {guess}");
+        guess_count += 1;
 
         match guess.cmp(&secret_num) {
-            Ordering::Less => println!("small."),
-            Ordering::Greater => println!("big."),
+            Ordering::Less => println!("small. (ur {guess_count} attempt)"),
+            Ordering::Greater => println!("big. (ur {guess_count} attempt)"),
             Ordering::Equal => {
-                println!("enough.");
+                println!("enough on {guess_count} attempt.");
                 break;
             }
         }
