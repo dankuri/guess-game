@@ -7,13 +7,13 @@ fn main() {
     let mut guess_mode = String::new();
 
     print!("u guess or i guess? ");
-    stdout().flush().expect("unable to flush stdout!"); // if not present - print!() will appear after the input
+    stdout().flush().expect("unable to flush stdout!");
 
     stdin()
         .read_line(&mut guess_mode)
         .expect("no like dis line bruv :/");
 
-    guess_mode = guess_mode.trim().to_string(); // trimming trailing \n and converting back to String (from &str)
+    guess_mode = guess_mode.trim().to_string();
 
     while guess_mode != "u" && guess_mode != "i" {
         guess_mode = String::new();
@@ -83,56 +83,23 @@ fn guess_reverse() {
     let mut lower: u32 = 1;
     let mut higher: u32 = 100;
     let mut guess: u32 = rand::thread_rng().gen_range(lower..=higher);
-    let mut attempts: u32 = 1;
+    let mut attempts: u32 = 0;
 
     thread::sleep(half_sec);
     println!(
         "for ur answer pls type + if ur num is bigger, - if ur num is smaller and = if i won!"
     );
     thread::sleep(two_secs);
-    println!("my {attempts} attempt..");
-    print!("is ur num {guess}? ");
-    stdout().flush().expect("unable to flush stdout!");
 
-    let mut answer = String::new();
-
-    io::stdin()
-        .read_line(&mut answer)
-        .expect("no like dis line bruv :/");
-
-    answer = answer.trim().to_string();
-
-    while answer != "=" {
+    while lower != higher {
         attempts += 1;
-        match answer.as_str() {
-            "+" => {
-                lower = guess + 1;
-            }
-            "-" => {
-                higher = guess - 1;
-            }
-            _ => {
-                println!("dunno wat dat means..");
-                attempts -= 1;
-            }
-        }
 
-        let is_valid_answer = check_answer(lower, higher);
-        if is_valid_answer {
-            guess = rand::thread_rng().gen_range(lower..=higher);
-            thread::sleep(half_sec);
-            println!("so ur num is between {lower} and {higher}..")
-        } else {
-            println!("can't be true, let's try again..");
-            lower = 1;
-            higher = 100;
-            guess = rand::thread_rng().gen_range(lower..=higher);
-        }
-
-        answer = String::new();
+        let mut answer = String::new();
 
         thread::sleep(half_sec);
         println!("my {attempts} attempt..");
+
+        guess = rand::thread_rng().gen_range(lower..=higher);
         print!("is ur num {guess}? ");
         stdout().flush().expect("unable to flush stdout!");
 
@@ -140,13 +107,48 @@ fn guess_reverse() {
             .read_line(&mut answer)
             .expect("no like dis line bruv :/");
         answer = answer.trim().to_string();
+
+        match answer.as_str() {
+            "+" => {
+                lower = guess + 1;
+            }
+            "-" => {
+                higher = guess - 1;
+            }
+            "=" => {
+                break;
+            }
+            _ => {
+                attempts -= 1;
+                println!("dunno wat dat means..");
+                thread::sleep(half_sec);
+                println!("let's try again..");
+                thread::sleep(two_secs);
+            }
+        }
+
+        let is_valid_answer = check_answer(lower, higher);
+        if is_valid_answer {
+            thread::sleep(half_sec);
+            println!("so ur num is between {lower} and {higher}..")
+        } else {
+            println!("can't be true, let's try again..");
+            lower = 1;
+            higher = 100;
+            attempts = 1;
+        }
     }
+
+    if lower == higher {
+        guess = lower;
+    }
+
     thread::sleep(half_sec);
-    println!("i won at my {attempts} attempt!");
+    println!("i won at my {attempts} attempt! da num is {guess}!!!");
 }
 
 fn check_answer(lower: u32, higher: u32) -> bool {
-    if lower >= higher {
+    if lower > higher {
         return false;
     } else {
         return true;
