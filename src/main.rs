@@ -108,7 +108,10 @@ fn guess_reverse() {
             "-" => {
                 higher = guess - 1;
             }
-            _ => println!("dunno wat dat means.."),
+            _ => {
+                println!("dunno wat dat means..");
+                attempts -= 1;
+            }
         }
 
         let is_valid_answer = check_answer(lower, higher);
