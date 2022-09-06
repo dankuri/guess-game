@@ -1,11 +1,12 @@
 use rand::Rng;
 use std::cmp::Ordering;
 use std::io::{self, stdin, stdout, Write};
+use std::{thread, time::Duration};
 
 fn main() {
     let mut guess_mode = String::new();
 
-    print!("u guess or i guess?: ");
+    print!("u guess or i guess? ");
     stdout().flush().expect("unable to flush stdout!"); // if not present - print!() will appear after the input
 
     stdin()
@@ -72,15 +73,23 @@ fn main() {
 
 fn guess_reverse() {
     println!("u chose me to guess..");
+    let half_sec = Duration::from_secs_f32(0.5);
+    let two_secs = Duration::from_secs(2);
+    thread::sleep(half_sec);
     println!("so think about a num from 1 to 100.");
     let mut lower: u32 = 1;
     let mut higher: u32 = 100;
     let mut guess: u32 = rand::thread_rng().gen_range(lower..=higher);
     let mut attempts: u32 = 0;
-    println!("is ur num {guess}?");
+    thread::sleep(half_sec);
     println!(
         "for ur answer pls type + if ur num is bigger, - if ur num is smaller and = if i won!"
     );
+    thread::sleep(two_secs);
+    attempts += 1;
+    println!("my {attempts} attempt..");
+    print!("is ur num {guess}? ");
+    stdout().flush().expect("unable to flush stdout!");
 
     let mut answer = String::new();
 
@@ -105,6 +114,7 @@ fn guess_reverse() {
         let is_valid_answer = check_answer(lower, higher);
         if is_valid_answer {
             guess = rand::thread_rng().gen_range(lower..=higher);
+            thread::sleep(half_sec);
             println!("so ur num is between {lower} and {higher}..")
         } else {
             println!("can't be true, let's try again..");
@@ -115,14 +125,16 @@ fn guess_reverse() {
 
         answer = String::new();
 
-        print!("is ur num {guess} ({attempts} attempt)? ");
+        thread::sleep(half_sec);
+        println!("my {attempts} attempt..");
+        print!("is ur num {guess}? ");
         stdout().flush().expect("unable to flush stdout!");
         io::stdin()
             .read_line(&mut answer)
             .expect("no like dis line bruv :/");
         answer = answer.trim().to_string();
     }
-
+    thread::sleep(half_sec);
     println!("i won at my {attempts} attempt!");
 }
 
