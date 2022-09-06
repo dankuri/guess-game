@@ -72,4 +72,69 @@ fn main() {
 
 fn guess_reverse() {
     println!("u chose me to guess..");
+    println!("so think about a num from 1 to 100.");
+    let mut lower: u32 = 1;
+    let mut higher: u32 = 100;
+    let mut guess = rand::thread_rng().gen_range(lower..=higher);
+
+    println!("is ur num {guess}?");
+    println!(
+        "for ur answer pls type + if ur num is bigger, - if ur num is smaller and = if i won!"
+    );
+
+    let mut answer = String::new();
+
+    io::stdin()
+        .read_line(&mut answer)
+        .expect("no like dis line bruv :/");
+
+    answer = answer.trim().to_string();
+
+    while answer != "=" {
+        match answer.as_str() {
+            "+" => {
+                lower = guess + 1;
+                let is_valid_answer = check_answer(lower, higher);
+                if is_valid_answer {
+                    guess = rand::thread_rng().gen_range(lower..=higher);
+                    println!("so ur num is between {lower} and {higher}..")
+                } else {
+                    println!("can't be true, let's try again..");
+                    lower = 1;
+                    higher = 100;
+                    guess = rand::thread_rng().gen_range(lower..=higher);
+                }
+            }
+            "-" => {
+                higher = guess - 1;
+                let is_valid_answer = check_answer(lower, higher);
+                if is_valid_answer {
+                    guess = rand::thread_rng().gen_range(lower..=higher);
+                    println!("so ur num is between {lower} and {higher}..")
+                } else {
+                    println!("can't be true, let's try again..");
+                    lower = 1;
+                    higher = 100;
+                    guess = rand::thread_rng().gen_range(lower..=higher);
+                }
+            }
+            _ => println!("dunno wat dat means.."),
+        }
+        answer = String::new();
+
+        print!("is ur num {guess}? ");
+        stdout().flush().expect("unable to flush stdout!");
+        io::stdin()
+            .read_line(&mut answer)
+            .expect("no like dis line bruv :/");
+        answer = answer.trim().to_string();
+    }
+}
+
+fn check_answer(lower: u32, higher: u32) -> bool {
+    if lower >= higher {
+        return false;
+    } else {
+        return true;
+    }
 }
