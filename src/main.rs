@@ -73,20 +73,23 @@ fn main() {
 
 fn guess_reverse() {
     println!("u chose me to guess..");
+
     let half_sec = Duration::from_secs_f32(0.5);
     let two_secs = Duration::from_secs(2);
+
     thread::sleep(half_sec);
     println!("so think about a num from 1 to 100.");
+
     let mut lower: u32 = 1;
     let mut higher: u32 = 100;
     let mut guess: u32 = rand::thread_rng().gen_range(lower..=higher);
-    let mut attempts: u32 = 0;
+    let mut attempts: u32 = 1;
+
     thread::sleep(half_sec);
     println!(
         "for ur answer pls type + if ur num is bigger, - if ur num is smaller and = if i won!"
     );
     thread::sleep(two_secs);
-    attempts += 1;
     println!("my {attempts} attempt..");
     print!("is ur num {guess}? ");
     stdout().flush().expect("unable to flush stdout!");
@@ -132,6 +135,7 @@ fn guess_reverse() {
         println!("my {attempts} attempt..");
         print!("is ur num {guess}? ");
         stdout().flush().expect("unable to flush stdout!");
+
         io::stdin()
             .read_line(&mut answer)
             .expect("no like dis line bruv :/");
