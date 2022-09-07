@@ -141,6 +141,7 @@ fn guess_reverse() {
 
     if lower == higher {
         guess = lower;
+        attempts += 1;
     }
 
     thread::sleep(half_sec);
