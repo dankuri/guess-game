@@ -135,7 +135,7 @@ fn guess_reverse() {
             println!("can't be true, let's try again..");
             lower = 1;
             higher = 100;
-            attempts = 1;
+            attempts = 0;
         }
     }
 
@@ -149,9 +149,5 @@ fn guess_reverse() {
 }
 
 fn check_answer(lower: u32, higher: u32) -> bool {
-    if lower > higher {
-        return false;
-    } else {
-        return true;
-    }
+    lower <= higher
 }
