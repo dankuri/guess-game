@@ -82,7 +82,7 @@ fn guess_reverse() {
 
     let mut lower: u32 = 1;
     let mut higher: u32 = 100;
-    let mut guess: u32 = rand::thread_rng().gen_range(lower..=higher);
+    let mut guess: u32 = 0;
     let mut attempts: u32 = 0;
 
     thread::sleep(half_sec);
@@ -127,8 +127,7 @@ fn guess_reverse() {
             }
         }
 
-        let is_valid_answer = check_answer(lower, higher);
-        if is_valid_answer {
+        if lower <= higher {
             thread::sleep(half_sec);
             println!("so ur num is between {lower} and {higher}..")
         } else {
@@ -146,8 +145,4 @@ fn guess_reverse() {
 
     thread::sleep(half_sec);
     println!("i won at my {attempts} attempt! da num is {guess}!!!");
-}
-
-fn check_answer(lower: u32, higher: u32) -> bool {
-    lower <= higher
 }
