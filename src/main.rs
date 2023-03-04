@@ -1,78 +1,94 @@
+use console::{style, Term};
+use dialoguer::{theme::ColorfulTheme, Input, Select};
 use rand::Rng;
 use std::cmp::Ordering;
-use std::io::{self, stdin, stdout, Write};
 use std::{thread, time::Duration};
 
 fn main() {
-    let mut guess_mode = String::new();
+    let term = Term::stdout();
+    term.clear_screen().unwrap();
+    term.set_title("dankuri's guess game");
+    println!(
+        "{}",
+        style("welcome to dankuri's guess game!")
+            .green()
+            .bold()
+            .bright()
+    );
+    thread::sleep(Duration::from_secs_f32(0.5));
 
-    print!("u guess or i guess? ");
-    stdout().flush().expect("unable to flush stdout!");
+    let guess_modes = &["player", "computer"];
+    let selected_mode = Select::with_theme(&ColorfulTheme::default())
+        .with_prompt("Pick who guesses")
+        .default(0)
+        .items(guess_modes)
+        .interact()
+        .unwrap();
 
-    stdin()
-        .read_line(&mut guess_mode)
-        .expect("no like dis line bruv :/");
-
-    guess_mode = guess_mode.trim().to_string();
-
-    while guess_mode != "u" && guess_mode != "i" {
-        guess_mode = String::new();
-
-        print!("bruv. type u or i: ");
-        stdout().flush().expect("unable to flush stdout!");
-
-        stdin()
-            .read_line(&mut guess_mode)
-            .expect("no like dis line bruv :/");
-
-        guess_mode = guess_mode.trim().to_string();
+    match guess_modes[selected_mode] {
+        "computer" => cpu_guess(),
+        "player" => player_guess(),
+        _ => println!("how you got here?"),
     }
+}
 
-    if guess_mode == "u" {
-        guess_reverse();
-        return;
-    }
-
+fn player_guess() {
+    let term = Term::stdout();
+    term.set_title("yoo you guessinnnng");
     println!("guess my num (1 to 100), u have 8 attempts");
 
     let secret_num = rand::thread_rng().gen_range(1..=100);
     let mut guess_count = 0;
 
     while guess_count < 8 {
-        print!("type ur guess: ");
-        stdout().flush().expect("unable to flush stdout!");
+        let mut input: String = Input::with_theme(&ColorfulTheme::default())
+            .with_prompt("Type in number from 1 to 100")
+            .interact_text()
+            .unwrap();
 
-        let mut guess = String::new();
+        while input.parse::<u32>().is_err() {
+            println!("Please type number from 1 to 100!!!");
+            input = Input::with_theme(&ColorfulTheme::default())
+                .with_prompt("C'mon bruh")
+                .interact_text()
+                .unwrap();
+        }
 
-        io::stdin()
-            .read_line(&mut guess)
-            .expect("no like dis line bruv :/");
-
-        let guess: u32 = match guess.trim().parse() {
-            Ok(num) => num,
-            Err(_) => continue,
-        };
-
+        let guess: u32 = input.parse().unwrap();
         guess_count += 1;
-        println!("ur guess: {guess} (ur {guess_count} attempt)");
+
+        println!(
+            "ur guess: {} (ur {} attempt)",
+            style(guess).bold().cyan(),
+            style(guess_count).red()
+        );
 
         match guess.cmp(&secret_num) {
-            Ordering::Less => println!("small."),
-            Ordering::Greater => println!("big."),
+            Ordering::Less => println!("{}", style("small.").red()),
+            Ordering::Greater => println!("{}", style("big.").red()),
             Ordering::Equal => {
-                println!("enough on {guess_count} attempt.");
+                println!(
+                    "yep. you got {} on {} attempt.",
+                    style(secret_num).bold().green(),
+                    style(guess_count).bold().green()
+                );
                 break;
             }
         }
     }
 
-    if guess_count == 8 {
-        println!("u lost. u must be faster than binary search!")
+    if guess_count > 8 {
+        println!(
+            "u {}. u must be faster than binary search!",
+            style("lost").bold().red()
+        );
     }
 }
 
-fn guess_reverse() {
-    println!("u chose me to guess..");
+fn cpu_guess() {
+    println!("u chose {} to guess..", style("me").bold().cyan());
+    let term = Term::stdout();
+    term.set_title("this kamputer is guessiiiiinnnnnnnnnng");
 
     let half_sec = Duration::from_secs_f32(0.5);
     let two_secs = Duration::from_secs(2);
@@ -85,56 +101,46 @@ fn guess_reverse() {
     let mut guess: u32 = 0;
     let mut attempts: u32 = 0;
 
-    thread::sleep(half_sec);
-    println!(
-        "for ur answer pls type + if ur num is bigger, - if ur num is smaller and = if i won!"
-    );
     thread::sleep(two_secs);
 
     while lower != higher {
         attempts += 1;
 
-        let mut answer = String::new();
-
         thread::sleep(half_sec);
-        println!("my {attempts} attempt..");
+        println!("my {} attempt..", style(attempts).red());
 
         guess = rand::thread_rng().gen_range(lower..=higher);
-        print!("is ur num {guess}? ");
-        stdout().flush().expect("unable to flush stdout!");
+        let answers = &["yep", "less.", "more."];
+        let answer = Select::with_theme(&ColorfulTheme::default())
+            .with_prompt(format!("is ur num {}", style(guess).yellow().bold()))
+            .default(0)
+            .items(answers)
+            .interact()
+            .unwrap();
 
-        io::stdin()
-            .read_line(&mut answer)
-            .expect("no like dis line bruv :/");
-        answer = answer.trim().to_string();
-
-        match answer.as_str() {
-            "+" => {
-                lower = guess + 1;
-            }
-            "-" => {
-                higher = guess - 1;
-            }
-            "=" => {
-                break;
-            }
-            _ => {
-                attempts -= 1;
-                println!("dunno wat dat means..");
-                thread::sleep(half_sec);
-                println!("let's try again..");
-                thread::sleep(two_secs);
-            }
+        match answers[answer] {
+            "yep" => break,
+            "less." => higher = guess - 1,
+            "more." => lower = guess + 1,
+            _ => println!("yeah you can't be here"),
         }
 
-        if lower <= higher {
-            thread::sleep(half_sec);
-            println!("so ur num is between {lower} and {higher}..")
-        } else {
-            println!("can't be true, let's try again..");
-            lower = 1;
-            higher = 100;
-            attempts = 0;
+        match lower.cmp(&higher) {
+            Ordering::Equal => break,
+            Ordering::Less => {
+                thread::sleep(half_sec);
+                println!(
+                    "so ur num is between {} and {}..",
+                    style(lower).cyan(),
+                    style(higher).cyan()
+                );
+            }
+            Ordering::Greater => {
+                println!("can't be true, let's try again..");
+                lower = 1;
+                higher = 100;
+                attempts = 0;
+            }
         }
     }
 
@@ -144,5 +150,9 @@ fn guess_reverse() {
     }
 
     thread::sleep(half_sec);
-    println!("i won at my {attempts} attempt! da num is {guess}!!!");
+    println!(
+        "i won at my {} attempt! da num is {}!!!",
+        style(attempts).bold().green(),
+        style(guess).bold().green()
+    );
 }
